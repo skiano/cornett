@@ -99,33 +99,54 @@ function drawFlower(p, cx, cy, d, min = 0, max = 7, polarity = -1) {
   p.pop();
 }
 
+function drawLogo(p, cx, cy, d, marker = (p, x, y, s) => {
+  drawTarget(p, x, y, s, [4]);
+}) {
+  let standardRatio = 5.75; // how many circles to fit into the space
+  let slices = 20;
+  let angle = p.TAU / slices;
+  let gridSize = d / standardRatio;
+  let radius = (d / 2) - (gridSize / 2);
+  let open = 2;
+  for (let i = 0 + open; i <= slices - open; i += 1) {
+    let a = i * -angle;
+    let x = cx + p.cos(a) * radius;
+    let y = cy + p.sin(a) * radius;
+    marker(p, x, y, gridSize, i);
+  }
+}
+
 //////////////
 // SKETCHES //
 //////////////
 
-// SKETCHES.push(function randomDots(p) {
-//   const darks = getDarks(p);
-//   const lights = getLights(p);
-//   const bg = p.random(darks);
-//   const fg = p.random(lights);
+SKETCHES.push(function basicGrid(p) {
+  const darks = getDarks(p);
+  const lights = getLights(p);
+  const bg = p.random(darks);
+  const fg = p.random(lights);
 
-//   p.setup = function () {
-//     standardSetup(p);
-//     p.background(bg);
-//     p.fill(fg);
-//     p.noStroke();
-//   };
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
 
-//   p.draw = function () {
-//     p.background(bg);
-//     p.circle(p.random(0, p.width), p.random(0, p.height), p.random(50, 200));
-//     p.push();
-//     p.noFill();
-//     p.stroke(fg);
-//     p.square(0, 0, p.width);
-//     p.pop();
-//   };
-// });
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(10);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height - 100;
+
+    p.strokeWeight(2);
+    drawLogo(p, cx, cy, d);
+  };
+});
 
 SKETCHES.push(function basicGrid(p) {
   const darks = getDarks(p);
@@ -210,7 +231,8 @@ for (let i = 0; i < 12; i += 1) {
   sq.classList.add('sq');
   ROOT.appendChild(sq);
   new p5((p) => {
-    p.random(SKETCHES)(p);
+    // p.random(SKETCHES)(p);
+    SKETCHES[0](p);
   }, sq);
 }
 
