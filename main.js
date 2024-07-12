@@ -143,8 +143,10 @@ SKETCHES.push(function basicGrid(p) {
     let cy = p.height / 2;
     let d = p.height - 100;
 
-    p.strokeWeight(2);
-    drawLogo(p, cx, cy, d);
+    p.strokeWeight(1);
+    drawLogo(p, cx, cy, d, (p, x, y, d) => {
+      drawFlower(p, x, y, d);
+    });
   };
 });
 
