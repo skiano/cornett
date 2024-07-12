@@ -233,8 +233,8 @@ for (let i = 0; i < 12; i += 1) {
   sq.classList.add('sq');
   ROOT.appendChild(sq);
   new p5((p) => {
-    // p.random(SKETCHES)(p);
-    SKETCHES[0](p);
+    p.random(SKETCHES)(p);
+    // SKETCHES[0](p);
   }, sq);
 }
 
