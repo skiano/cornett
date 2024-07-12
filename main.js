@@ -14,13 +14,6 @@ const SKETCHES = [];
 // COMMON HELPERS //
 ////////////////////
 
-function standardSetup(p) {
-  let s = p.drawingContext.canvas.parentNode;
-  let w = s.offsetWidth;
-  let h = s.offsetHeight;
-  p.createCanvas(w, h);
-}
-
 function getDarks(p) {
   let y = p.color(YELLOW);
   let b = p.color(BLACK);
@@ -45,10 +38,17 @@ function getLights(p) {
   ];
 }
 
+function standardSetup(p) {
+  let s = p.drawingContext.canvas.parentNode;
+  let w = s.offsetWidth;
+  let h = s.offsetHeight;
+  p.createCanvas(w, h);
+}
+
 function draw8x8(p, cx, cy, d) {
   p.push();
   p.noFill();
-
+  p.strokeWeight(1);
   let t = cy - d / 2;
   let b = t + d;
   let l = cx - d / 2;
@@ -58,14 +58,23 @@ function draw8x8(p, cx, cy, d) {
   for (let x = 0; x <= s; x += 1) {
     p.line(l + (x * g), t, l + (x * g), b);
   }
-
   for (let y = 0; y <= s; y += 1) {
     p.line(l, t + (y * g), r, t + (y * g));
   }
-
+  p.strokeWeight(2);
   p.rectMode(p.CENTER);
-  p.rect(cx, cy, d + 10, d + 10);
+  p.rect(cx, cy, d, d);
   p.pop();
+}
+
+function drawTarget(p, cx, cy, d) {
+  p.push();
+  p.noFill();
+  let s = 8 / 2;
+  let g = d / s;
+  for (let x = 1; x <= s; x += 1) {
+    p.circle(cx, cy, (x * g));
+  }
 }
 
 //////////////
@@ -110,9 +119,18 @@ SKETCHES.push(function basicGrid(p) {
   };
 
   p.draw = function () {
+    p.background(bg);
     p.stroke(fg);
     p.noFill();
-    draw8x8(p, p.width / 2, p.height / 2, p.height / 2);
+
+    let cx = (p.width / 2 + p.frameCount) % p.width;
+    let cy = p.height / 2;
+    let d = p.height / 2;
+
+    draw8x8(p, cx, cy, d);
+
+    p.strokeWeight(6);
+    drawTarget(p, cx, cy, d);
   };
 });
 
