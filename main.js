@@ -48,6 +48,7 @@ function standardSetup(p) {
 function draw8x8(p, cx, cy, d) {
   p.push();
   p.noFill();
+  p.stroke(p.lerpColor(p.color(YELLOW), p.color(BLACK), 0.5));
   p.strokeWeight(1);
   let t = cy - d / 2;
   let b = t + d;
@@ -70,11 +71,32 @@ function draw8x8(p, cx, cy, d) {
 function drawTarget(p, cx, cy, d, mask = [1, 2, 3, 4]) {
   p.push();
   p.noFill();
+
   let s = 4;
   let g = d / s;
   mask.forEach(((i) => {
     p.circle(cx, cy, (i * g));
   }));
+
+  p.pop();
+}
+
+function drawFlower(p, cx, cy, d, min = 0, max = 7, polarity = -1) {
+  p.push();
+  p.noFill();
+  p.translate(cx, cy);
+  let spin = p.TAU / 8 * polarity;
+
+  if (max < min) {
+    [max, min] = [min, max];
+  }
+
+  p.rotate(spin * min);
+  for (let a = min; a <= max; a += 1) {
+    p.ellipse(d / 4, 0, d / 2, d / 4);
+    p.rotate(spin);
+  }
+  p.pop();
 }
 
 //////////////
@@ -122,11 +144,40 @@ SKETCHES.push(function basicGrid(p) {
     p.background(bg);
     p.stroke(fg);
     p.noFill();
+    p.frameRate(10);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height - 100;
+
+    draw8x8(p, cx, cy, d);
+    p.strokeWeight(4);
+    drawFlower(p, cx, cy, d, p.frameCount, p.frameCount + 3);
+  };
+});
+
+SKETCHES.push(function basicGrid(p) {
+  const darks = getDarks(p);
+  const lights = getLights(p);
+  const bg = p.random(darks);
+  const fg = p.random(lights);
+
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
     p.frameRate(5);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
-    let d = p.height / 2;
+    let d = p.height - 100;
 
     draw8x8(p, cx, cy, d);
 
