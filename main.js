@@ -67,14 +67,14 @@ function draw8x8(p, cx, cy, d) {
   p.pop();
 }
 
-function drawTarget(p, cx, cy, d) {
+function drawTarget(p, cx, cy, d, mask = [1, 2, 3, 4]) {
   p.push();
   p.noFill();
-  let s = 8 / 2;
+  let s = 4;
   let g = d / s;
-  for (let x = 1; x <= s; x += 1) {
-    p.circle(cx, cy, (x * g));
-  }
+  mask.forEach(((i) => {
+    p.circle(cx, cy, (i * g));
+  }));
 }
 
 //////////////
@@ -122,15 +122,35 @@ SKETCHES.push(function basicGrid(p) {
     p.background(bg);
     p.stroke(fg);
     p.noFill();
+    p.frameRate(5);
 
-    let cx = (p.width / 2 + p.frameCount) % p.width;
+    let cx = p.width / 2;
     let cy = p.height / 2;
     let d = p.height / 2;
 
     draw8x8(p, cx, cy, d);
 
+    const masks = [
+      [1],
+      [1, 2],
+      [1, 2, 3, 4],
+      [2, 3, 4],
+      [3, 4],
+      [4],
+      [4],
+      [1, 4],
+      [1, 4],
+      [4],
+      [4],
+      [1, 4],
+      [1, 4],
+      [4],
+      [4],
+      [1, 4],
+    ];
+
     p.strokeWeight(6);
-    drawTarget(p, cx, cy, d);
+    drawTarget(p, cx, cy, d, masks[p.frameCount % masks.length]);
   };
 });
 
