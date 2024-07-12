@@ -126,6 +126,29 @@ SKETCHES.push(function basicGrid(p) {
   const bg = p.random(darks);
   const fg = p.random(lights);
 
+  const markers = p.shuffle([
+    (p, x, y, d) => {
+      p.strokeWeight(1);
+      drawFlower(p, x, y, d);
+    },
+    (p, x, y, d) => {
+      p.strokeWeight(3);
+      drawTarget(p, x, y, d);
+    },
+    (p, x, y, d) => {
+      p.strokeWeight(3);
+      drawTarget(p, x, y, d, [1]);
+    },
+    (p, x, y, d) => {
+      p.strokeWeight(1);
+      drawTarget(p, x, y, d, [4]);
+    },
+    (p, x, y, d) => {
+      p.strokeWeight(3);
+      drawTarget(p, x, y, d, [1, 4]);
+    }
+  ])
+
   p.setup = function () {
     standardSetup(p);
     p.background(bg);
@@ -137,16 +160,13 @@ SKETCHES.push(function basicGrid(p) {
     p.background(bg);
     p.stroke(fg);
     p.noFill();
-    p.frameRate(10);
+    p.frameRate(2);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
-    let d = p.height - 100;
+    let d = p.height / 3 * 2;
 
-    p.strokeWeight(1);
-    drawLogo(p, cx, cy, d, (p, x, y, d) => {
-      drawFlower(p, x, y, d);
-    });
+    drawLogo(p, cx, cy, d, markers[p.frameCount % markers.length]);
   };
 });
 
@@ -171,7 +191,7 @@ SKETCHES.push(function basicGrid(p) {
 
     let cx = p.width / 2;
     let cy = p.height / 2;
-    let d = p.height - 100;
+    let d = p.height / 5 * 3;
 
     draw8x8(p, cx, cy, d);
     p.strokeWeight(4);
@@ -200,7 +220,7 @@ SKETCHES.push(function basicGrid(p) {
 
     let cx = p.width / 2;
     let cy = p.height / 2;
-    let d = p.height - 100;
+    let d = p.height / 5 * 3;
 
     draw8x8(p, cx, cy, d);
 
