@@ -13,13 +13,15 @@ function sketch(p) {
     console.log(w, h)
 
     p.createCanvas(w, h);
-    p.background(255);
-    p.fill(0);
-    p.stroke(255);
+    p.background(p.random(0, 255));
+    p.fill(p.random(0, 255));
+    p.stroke(p.random(0, 255));
   };
 
   p.draw = function () {
-    p.square(p.mouseX, p.mouseY, 50);
+    if (p.mouseX > 0 && p.mouseY > 0) {
+      p.square(p.mouseX, p.mouseY, 50);
+    }
   };
 }
 
