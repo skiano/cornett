@@ -8,7 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
+# dist JANKY HACK FOR GITHUB PAGES
 dist-ssr
 *.local
 
