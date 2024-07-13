@@ -70,7 +70,6 @@ function draw8x8(p, cx, cy, d) {
 
 function drawTarget(p, cx, cy, d, mask = [1, 2, 3, 4]) {
   p.push();
-  p.noFill();
 
   let s = 4;
   let g = d / s;
@@ -83,7 +82,6 @@ function drawTarget(p, cx, cy, d, mask = [1, 2, 3, 4]) {
 
 function drawFlower(p, cx, cy, d, min = 0, max = 7, polarity = -1) {
   p.push();
-  p.noFill();
   p.translate(cx, cy);
   let spin = p.TAU / 8 * polarity;
 
@@ -116,9 +114,69 @@ function drawLogo(p, cx, cy, d, marker = (p, x, y, s) => {
   }
 }
 
+function drawClipLogo(p, cx, cy, d, marker = (p, x, y, s) => {
+  drawTarget(p, x, y, s, [4]);
+}) {
+  let standardRatio = 5.75; // how many circles to fit into the space
+  let slices = 20;
+  let angle = p.TAU / slices;
+  let gridSize = d / standardRatio;
+  let radius = (d / 2) - (gridSize / 2);
+  let open = 2;
+  for (let i = 0 + open; i <= slices - open; i += 1) {
+    let a = i * -angle;
+    let x = cx + p.cos(a) * radius;
+    let y = cy + p.sin(a) * radius;
+    p.push();
+    p.clip(() => {
+      p.fill(0);
+      let start = i === slices - open ? 0 : a - (angle/2);
+      let end = i === 0 + open ? p.TAU : a + (angle / 2);
+      p.arc(cx, cy, d + p.width, d + p.height, start, end);
+      p.noFill(); // THIS IS SUPER ANNOYING THAT I CANNOT RESTORE TO WHATEVER WAS BEFORE
+    });
+    marker(p, x, y, gridSize, i);
+    p.pop();
+  }
+}
+
 //////////////
 // SKETCHES //
 //////////////
+
+SKETCHES.push(function basicGrid(p) {
+  const darks = getDarks(p);
+  const lights = getLights(p);
+  const bg = p.random(darks);
+  const fg = p.random(lights);
+
+  const markers = p.shuffle([
+    (p, x, y, d) => {
+      p.strokeWeight(4);
+      drawTarget(p, x, y, d, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    },
+  ])
+
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(2);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 3 * 2;
+
+    drawClipLogo(p, cx, cy, d, markers[p.frameCount % markers.length]);
+  };
+});
 
 SKETCHES.push(function basicGrid(p) {
   const darks = getDarks(p);
@@ -144,9 +202,14 @@ SKETCHES.push(function basicGrid(p) {
       drawTarget(p, x, y, d, [4]);
     },
     (p, x, y, d) => {
+      p.strokeWeight(1);
+      drawTarget(p, x, y, d, [4]);
+      drawFlower(p, x, y, d);
+    },
+    (p, x, y, d) => {
       p.strokeWeight(3);
       drawTarget(p, x, y, d, [1, 4]);
-    }
+    },
   ])
 
   p.setup = function () {
@@ -167,6 +230,54 @@ SKETCHES.push(function basicGrid(p) {
     let d = p.height / 3 * 2;
 
     drawLogo(p, cx, cy, d, markers[p.frameCount % markers.length]);
+  };
+});
+
+SKETCHES.push(function basicGrid(p) {
+  const darks = getDarks(p);
+  const lights = getLights(p);
+  const bg = p.random(darks);
+  const fg = p.random(lights);
+
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
+
+  let masks = [
+    [1],
+    [1.5],
+    [2],
+    [2.5],
+    [3],
+    [3.5],
+    [4],
+    [3.5],
+    [3],
+    [2.5],
+    [2],
+  ]
+
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(24);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 4 * 3;
+
+    drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
+      p.strokeWeight(1);
+      p.fill(fg);
+      p.stroke(fg);
+      drawTarget(p, x, y, d, [0.5]);
+      p.noFill();
+      drawTarget(p, x, y, d, [(p.frameCount / 2) % 24 + i / 3]);
+    });
   };
 });
 
