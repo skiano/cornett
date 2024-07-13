@@ -14,6 +14,10 @@ const SKETCHES = [];
 // COMMON HELPERS //
 ////////////////////
 
+function smoothstep (x) {
+  return x * x * (3 - 2 * x);
+};
+
 function getDarks(p) {
   let y = p.color(YELLOW);
   let b = p.color(BLACK);
@@ -145,11 +149,10 @@ function drawBurst(p, cx, cy, d, levels = 3, makeColors = (p) => {
 
 function drawLogo(p, cx, cy, d, marker = (p, x, y, s) => {
   drawTarget(p, x, y, s, [4]);
-}) {
-  let standardRatio = 5.75; // how many circles to fit into the space
+}, ratio = 5.75) {
   let slices = 20;
   let angle = p.TAU / slices;
-  let gridSize = d / standardRatio;
+  let gridSize = d / ratio;
   let radius = (d / 2) - (gridSize / 2);
   let open = 2;
   for (let i = 0 + open; i <= slices - open; i += 1) {
@@ -344,8 +347,7 @@ SKETCHES.push(function basicLogos(p, [fg, bg]) {
     },
     (p, x, y, d) => {
       p.strokeWeight(1);
-      drawTarget(p, x, y, d, [4]);
-      drawFlower(p, x, y, d);
+      drawFlower(p, x, y, d * 3.3);
     },
     (p, x, y, d) => {
       p.strokeWeight(3);
@@ -364,7 +366,7 @@ SKETCHES.push(function basicLogos(p, [fg, bg]) {
     p.background(bg);
     p.stroke(fg);
     p.noFill();
-    p.frameRate(2);
+    p.frameRate(1);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
@@ -385,7 +387,6 @@ SKETCHES.push(function burstLogos(p, [fg, bg]) {
   p.draw = function () {
     p.background(bg);
     p.background(p.lerpColor(p.color(YELLOW), p.color(BLACK), 0.5));
-    // p.stroke(fg);
     p.noFill();
     p.frameRate(12);
 
@@ -394,19 +395,19 @@ SKETCHES.push(function burstLogos(p, [fg, bg]) {
     let d = p.height / 3 * 2;
 
     drawLogo(p, cx, cy, d, (p, x, y, d) => {
-      p.push();
-      p.fill(fg);
-      p.noStroke();
-      drawBurst(p, x, y, d * 1.5, 7, () => getDarks(p));
-      p.pop();
+      drawBurst(p, x, y, d * 15, 1);
     });
 
     drawLogo(p, cx, cy, d, (p, x, y, d) => {
-      p.push();
-      p.fill(fg);
-      p.noStroke();
+      drawBurst(p, x, y, d * 5, 1, () => getLights(p));
+    });
+
+    drawLogo(p, cx, cy, d, (p, x, y, d) => {
+      drawBurst(p, x, y, d * 2.5, 7, () => getDarks(p));
+    });
+
+    drawLogo(p, cx, cy, d, (p, x, y, d) => {
       drawDust(p, x, y, (p.sin(p.frameCount / 14) * d + 2) * 1.5);
-      p.pop();
     });
   };
 });
@@ -436,12 +437,18 @@ SKETCHES.push(function ripple(p, [fg, bg]) {
   };
 });
 
-SKETCHES.push(function ripple(p, [fg, bg]) {
+SKETCHES.push(function gather(p, [fg, bg]) {
+  let randomPositions = [];
   p.setup = function () {
     standardSetup(p);
     p.background(bg);
     p.fill(fg);
     p.noStroke();
+    let out = p.height;
+    randomPositions = [...new Array(30)].map(() => [
+      p.random(-out, p.width + out),
+      p.random(-out, p.height + out)
+    ]);
   };
 
   p.draw = function () {
@@ -454,35 +461,158 @@ SKETCHES.push(function ripple(p, [fg, bg]) {
     let cy = p.height / 2;
     let d = p.height / 4 * 3;
 
-    drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
-      p.strokeWeight(1);
-      drawTarget(p, x, y, d, [(p.frameCount / 2) % 24 + i / 3]);
-    });
+    for (let l = 0; l < 8; l++) {
+      drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
+        let t = smoothstep(p.norm(p.sin(p.frameCount / 15), -1, 1));
+        p.fill(bg);
+        p.stroke(fg);
+        p.strokeWeight(4)
+        let [ix, iy] = randomPositions[(i + (l * 3)) % randomPositions.length];
+        drawTarget(p, p.lerp(ix, x, t), p.lerp(iy, y, t), d, [2]);
+      });
+    }
   };
 });
 
-SKETCHES.push(function ripple(p, [fg, bg]) {
+SKETCHES.push(function gravity(p, [fg, bg]) {
   p.setup = function () {
     standardSetup(p);
     p.background(bg);
-    p.fill(fg);
-    p.noStroke();
+    p.stroke(fg);
+    p.strokeWeight(1);
+    p.noFill();
   };
 
   p.draw = function () {
     p.background(bg);
-    p.stroke(fg);
-    p.noFill();
-    p.frameRate(24);
+    p.frameRate(18);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
     let d = p.height / 4 * 3;
 
-    drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
-      p.strokeWeight(1);
-      drawTarget(p, x, y, d, [(p.frameCount / 2) % 24 + i / 3]);
-    });
+    let t = smoothstep(p.norm(p.sin(p.frameCount / 5), -1, 1));
+
+    let min = p.map(t, 0, 1, 2, 10);
+    let max = p.map(t, 0, 1, 10, 40);
+
+    for (let i = min; i < max; i++) {
+      drawLogo(p, cx, cy, d, (p, x, y, d) => {
+        drawTarget(p, x, y, d, [4]);
+      }, i);
+    }
+  };
+});
+
+SKETCHES.push(function gravity(p, [fg, bg]) {
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.stroke(fg);
+    p.strokeWeight(2);
+    p.noFill();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.frameRate(18);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 5;
+    let t = smoothstep(p.norm(p.frameCount % 20, 0, 20));
+    let t2 = smoothstep(p.norm(p.frameCount % 40, 0, 40));
+
+    for (let i = p.map(t2, 0, 1, 0, 50); i < p.map(t, 0, 1, 0, 200); i++) {
+      p.fill(i % 2 === 1 ? fg : bg);
+      drawLogo(p, cx, cy, d + (i * 25), (p, x, y, d) => {
+        drawTarget(p, x, y, d, [2]);
+      });
+    }
+  };
+});
+
+SKETCHES.push(function checkers(p, [fg, bg]) {
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.frameRate(3);
+
+    let detail = 5;
+    let d = p.height / detail;
+
+    for (let ix = 0; ix < detail; ix ++) {
+      for (let iy = 0; iy < detail; iy ++) {
+        let cx = ix * d + (d / 2);
+        let cy = iy * d + (d / 2);
+        let r = p.random(1, 4);
+        drawLogo(p, cx, cy, d, (p, x, y, d) => {
+          if (ix % 2 === iy % 2) {
+            p.strokeWeight(1);
+            drawTarget(p, x, y, d * 1, [r]);
+          } else {
+            drawFlower(p, x, y, d * 1);
+          }
+        });
+      }
+    }
+  };
+});
+
+SKETCHES.push(function checkers(p, [fg, bg]) {
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.frameRate(24);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+
+    p.push();
+      p.clip(() => {
+        p.arc(cx, cy, p.width * 2, p.height * 2, 0, -p.frameCount / 10, p.PIE);
+      });
+      p.background(fg)
+      p.fill(bg)
+      p.noStroke();
+      drawLogo(p, cx, cy, p.width / 3 * 2, (p, x, y, d) => {
+        drawTarget(p, x, y, d, [10]);
+      });
+
+      p.fill(fg)
+      drawLogo(p, cx, cy, p.width / 3 * 2, (p, x, y, d) => {
+        drawTarget(p, x, y, d, [1]);
+      });
+    p.pop();
+
+    p.push();
+      p.clip(() => {
+        p.arc(cx, cy, p.width * 2, p.height * 2, 0, -p.frameCount / 10, p.PIE);
+      }, { invert: true });
+      p.background(bg)
+      p.fill(fg)
+      p.noStroke();
+      drawLogo(p, cx, cy, p.width / 3 * 2, (p, x, y, d) => {
+        drawFlower(p, x, y, d * 2.75);
+      });
+
+      p.fill(bg)
+      drawLogo(p, cx, cy, p.width / 3 * 2, (p, x, y, d) => {
+        drawTarget(p, x, y, d, [1]);
+      });
+    p.pop();
   };
 });
 
