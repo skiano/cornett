@@ -18,12 +18,12 @@ function getDarks(p) {
   let y = p.color(YELLOW);
   let b = p.color(BLACK);
   return [
-    p.lerpColor(y, b, 0.6),
-    p.lerpColor(y, b, 0.7),
-    p.lerpColor(y, b, 0.8),
-    p.lerpColor(y, b, 0.9),
+    // p.lerpColor(y, b, 0.85),
+    // p.lerpColor(y, b, 0.9),
+    p.lerpColor(y, b, 0.95),
+    p.lerpColor(y, b, 0.97),
     b
-  ];
+  ].reverse();
 }
 
 function getLights(p) {
@@ -31,10 +31,10 @@ function getLights(p) {
   let b = p.color(BLACK);
   return [
     y,
+    p.lerpColor(y, b, 0.05),
     p.lerpColor(y, b, 0.1),
-    p.lerpColor(y, b, 0.2),
-    p.lerpColor(y, b, 0.3),
-    p.lerpColor(y, b, 0.4),
+    // p.lerpColor(y, b, 0.15),
+    // p.lerpColor(y, b, 0.2),
   ];
 }
 
@@ -62,9 +62,9 @@ function draw8x8(p, cx, cy, d) {
   for (let y = 0; y <= s; y += 1) {
     p.line(l, t + (y * g), r, t + (y * g));
   }
-  p.strokeWeight(2);
-  p.rectMode(p.CENTER);
-  p.rect(cx, cy, d, d);
+  // p.strokeWeight(2);
+  // p.rectMode(p.CENTER);
+  // p.rect(cx, cy, d, d);
   p.pop();
 }
 
@@ -145,17 +145,100 @@ function drawClipLogo(p, cx, cy, d, marker = (p, x, y, s) => {
 // SKETCHES //
 //////////////
 
-SKETCHES.push(function basicGrid(p) {
-  const darks = getDarks(p);
-  const lights = getLights(p);
-  const bg = p.random(darks);
-  const fg = p.random(lights);
+SKETCHES.push(function explainTarget(p, [fg, bg]) {
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
 
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(5);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 5 * 3;
+
+    draw8x8(p, cx, cy, d);
+
+    const masks = [
+      [1],
+      [1, 2],
+      [1, 2, 3, 4],
+      [2, 3, 4],
+      [3, 4],
+      [4],
+      [4],
+      [1, 4],
+      [1, 4],
+      [4],
+      [4],
+      [1, 4],
+      [1, 4],
+      [4],
+      [4],
+      [1, 4],
+    ];
+
+    p.strokeWeight(6);
+    drawTarget(p, cx, cy, d, masks[p.frameCount % masks.length]);
+  };
+});
+
+SKETCHES.push(function explainFlower(p, [fg, bg]) {
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(10);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 5 * 3;
+
+    draw8x8(p, cx, cy, d);
+    p.strokeWeight(4);
+    drawFlower(p, cx, cy, d, p.frameCount, p.frameCount + 3);
+  };
+});
+
+SKETCHES.push(function explainBursts(p, [fg, bg]) {
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(10);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 5 * 3;
+
+    draw8x8(p, cx, cy, d);
+    p.strokeWeight(4);
+    drawFlower(p, cx, cy, d, p.frameCount, p.frameCount + 3);
+  };
+});
+
+SKETCHES.push(function maskedOutlines(p, [fg, bg]) {
   const markers = p.shuffle([
-    (p, x, y, d) => {
-      p.strokeWeight(4);
-      drawTarget(p, x, y, d, [1, 2, 3, 4, 5, 6, 7, 8]);
-    },
     (p, x, y, d) => {
       p.strokeWeight(2);
       drawTarget(p, x, y, d, [6]);
@@ -167,6 +250,10 @@ SKETCHES.push(function basicGrid(p) {
     (p, x, y, d) => {
       p.strokeWeight(2);
       drawTarget(p, x, y, d);
+    },
+    (p, x, y, d) => {
+      p.strokeWeight(4);
+      drawTarget(p, x, y, d, [1, 2, 3, 4, 5, 6, 7, 8]);
     },
   ])
 
@@ -191,12 +278,7 @@ SKETCHES.push(function basicGrid(p) {
   };
 });
 
-SKETCHES.push(function basicGrid(p) {
-  const darks = getDarks(p);
-  const lights = getLights(p);
-  const bg = p.random(darks);
-  const fg = p.random(lights);
-
+SKETCHES.push(function basicLogos(p, [fg, bg]) {
   const markers = p.shuffle([
     (p, x, y, d) => {
       p.strokeWeight(1);
@@ -246,32 +328,13 @@ SKETCHES.push(function basicGrid(p) {
   };
 });
 
-SKETCHES.push(function basicGrid(p) {
-  const darks = getDarks(p);
-  const lights = getLights(p);
-  const bg = p.random(darks);
-  const fg = p.random(lights);
-
+SKETCHES.push(function ripple(p, [fg, bg]) {
   p.setup = function () {
     standardSetup(p);
     p.background(bg);
     p.fill(fg);
     p.noStroke();
   };
-
-  let masks = [
-    [1],
-    [1.5],
-    [2],
-    [2.5],
-    [3],
-    [3.5],
-    [4],
-    [3.5],
-    [3],
-    [2.5],
-    [2],
-  ]
 
   p.draw = function () {
     p.background(bg);
@@ -285,100 +348,24 @@ SKETCHES.push(function basicGrid(p) {
 
     drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
       p.strokeWeight(1);
-      p.fill(fg);
-      p.stroke(fg);
-      drawTarget(p, x, y, d, [0.5]);
-      p.noFill();
+      // p.fill(fg);
+      // p.stroke(fg);
+      // drawTarget(p, x, y, d, [0.5]);
+      // p.noFill();
       drawTarget(p, x, y, d, [(p.frameCount / 2) % 24 + i / 3]);
     });
   };
 });
 
-SKETCHES.push(function basicGrid(p) {
-  const darks = getDarks(p);
-  const lights = getLights(p);
-  const bg = p.random(darks);
-  const fg = p.random(lights);
-
-  p.setup = function () {
-    standardSetup(p);
-    p.background(bg);
-    p.fill(fg);
-    p.noStroke();
-  };
-
-  p.draw = function () {
-    p.background(bg);
-    p.stroke(fg);
-    p.noFill();
-    p.frameRate(10);
-
-    let cx = p.width / 2;
-    let cy = p.height / 2;
-    let d = p.height / 5 * 3;
-
-    draw8x8(p, cx, cy, d);
-    p.strokeWeight(4);
-    drawFlower(p, cx, cy, d, p.frameCount, p.frameCount + 3);
-  };
-});
-
-SKETCHES.push(function basicGrid(p) {
-  const darks = getDarks(p);
-  const lights = getLights(p);
-  const bg = p.random(darks);
-  const fg = p.random(lights);
-
-  p.setup = function () {
-    standardSetup(p);
-    p.background(bg);
-    p.fill(fg);
-    p.noStroke();
-  };
-
-  p.draw = function () {
-    p.background(bg);
-    p.stroke(fg);
-    p.noFill();
-    p.frameRate(5);
-
-    let cx = p.width / 2;
-    let cy = p.height / 2;
-    let d = p.height / 5 * 3;
-
-    draw8x8(p, cx, cy, d);
-
-    const masks = [
-      [1],
-      [1, 2],
-      [1, 2, 3, 4],
-      [2, 3, 4],
-      [3, 4],
-      [4],
-      [4],
-      [1, 4],
-      [1, 4],
-      [4],
-      [4],
-      [1, 4],
-      [1, 4],
-      [4],
-      [4],
-      [1, 4],
-    ];
-
-    p.strokeWeight(6);
-    drawTarget(p, cx, cy, d, masks[p.frameCount % masks.length]);
-  };
-});
-
-for (let i = 0; i < 12; i += 1) {
+SKETCHES.forEach((sketch, idx) => {
   const sq = document.createElement('div');
   sq.classList.add('sq');
   ROOT.appendChild(sq);
   new p5((p) => {
-    p.random(SKETCHES)(p);
-    // SKETCHES[0](p);
+    let darks = getDarks(p);
+    let lights = getLights(p);
+    const bg = darks[p.floor(idx / 2) % 2];
+    const fg = lights[p.floor(idx / 2) % 2];
+    sketch(p, idx % 2 ? [bg, fg] : [fg, bg]);
   }, sq);
-}
-
+});
