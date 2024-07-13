@@ -127,11 +127,12 @@ function drawClipLogo(p, cx, cy, d, marker = (p, x, y, s) => {
     let a = i * -angle;
     let x = cx + p.cos(a) * radius;
     let y = cy + p.sin(a) * radius;
+    let cushion = 0.001;
     p.push();
     p.clip(() => {
       p.fill(0);
       let start = i === slices - open ? 0 : a - (angle/2);
-      let end = i === 0 + open ? p.TAU : a + (angle / 2);
+      let end = i === 0 + open ? p.TAU : a + (angle / 2) + cushion;
       p.arc(cx, cy, d + p.width, d + p.height, start, end);
       p.noFill(); // THIS IS SUPER ANNOYING THAT I CANNOT RESTORE TO WHATEVER WAS BEFORE
     });
@@ -153,7 +154,19 @@ SKETCHES.push(function basicGrid(p) {
   const markers = p.shuffle([
     (p, x, y, d) => {
       p.strokeWeight(4);
-      drawTarget(p, x, y, d, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+      drawTarget(p, x, y, d, [1, 2, 3, 4, 5, 6, 7, 8]);
+    },
+    (p, x, y, d) => {
+      p.strokeWeight(2);
+      drawTarget(p, x, y, d, [6]);
+    },
+    (p, x, y, d) => {
+      p.strokeWeight(4);
+      drawTarget(p, x, y, d, [...new Array(32)].map((_, i) => i + 2));
+    },
+    (p, x, y, d) => {
+      p.strokeWeight(2);
+      drawTarget(p, x, y, d);
     },
   ])
 
