@@ -97,6 +97,28 @@ function drawFlower(p, cx, cy, d, min = 0, max = 7, polarity = -1) {
   p.pop();
 }
 
+function drawDust(p, cx, cy, d, amt = 1, makeColors = (p) => {
+  let y = p.color(YELLOW);
+  let b = p.color(BLACK);
+  let steps = 6;
+  return [...new Array(steps)].map((_, i) => p.lerpColor(y, b, i / steps));
+}) {
+  let n = d * d / 300 * amt;
+  let rad = 6;
+  let t = cy - d / 2;
+  let b = t + d;
+  let l = cx - d / 2;
+  let r = l + d;
+  let colors = makeColors(p);
+  for (let i = 0; i < n; i += 1) {
+    p.push();
+    p.noStroke();
+    p.fill(p.random(colors));
+    p.circle(p.random(l, r), p.random(t, b), rad);
+    p.pop();
+  }
+}
+
 function drawLogo(p, cx, cy, d, marker = (p, x, y, s) => {
   drawTarget(p, x, y, s, [4]);
 }) {
@@ -232,8 +254,7 @@ SKETCHES.push(function explainBursts(p, [fg, bg]) {
     let d = p.height / 5 * 3;
 
     draw8x8(p, cx, cy, d);
-    p.strokeWeight(4);
-    drawFlower(p, cx, cy, d, p.frameCount, p.frameCount + 3);
+    drawDust(p, cx, cy, d, 0.1);
   };
 });
 
@@ -328,6 +349,39 @@ SKETCHES.push(function basicLogos(p, [fg, bg]) {
   };
 });
 
+SKETCHES.push(function burstLogos(p, [fg, bg]) {
+  const markers = p.shuffle([
+    (p, x, y, d) => {
+      p.push();
+      p.fill(fg);
+      p.noStroke();
+      drawDust(p, x, y, (p.sin(p.frameCount / 14) * d + 2) * 1.5);
+      p.pop();
+    },
+  ])
+
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
+
+  p.draw = function () {
+    // p.background(bg);
+    p.background(p.lerpColor(p.color(YELLOW), p.color(BLACK), 0.5));
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(12);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 3 * 2;
+
+    drawLogo(p, cx, cy, d, markers[p.frameCount % markers.length]);
+  };
+});
+
 SKETCHES.push(function ripple(p, [fg, bg]) {
   p.setup = function () {
     standardSetup(p);
@@ -348,10 +402,56 @@ SKETCHES.push(function ripple(p, [fg, bg]) {
 
     drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
       p.strokeWeight(1);
-      // p.fill(fg);
-      // p.stroke(fg);
-      // drawTarget(p, x, y, d, [0.5]);
-      // p.noFill();
+      drawTarget(p, x, y, d, [(p.frameCount / 2) % 24 + i / 3]);
+    });
+  };
+});
+
+SKETCHES.push(function ripple(p, [fg, bg]) {
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(24);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 4 * 3;
+
+    drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
+      p.strokeWeight(1);
+      drawTarget(p, x, y, d, [(p.frameCount / 2) % 24 + i / 3]);
+    });
+  };
+});
+
+SKETCHES.push(function ripple(p, [fg, bg]) {
+  p.setup = function () {
+    standardSetup(p);
+    p.background(bg);
+    p.fill(fg);
+    p.noStroke();
+  };
+
+  p.draw = function () {
+    p.background(bg);
+    p.stroke(fg);
+    p.noFill();
+    p.frameRate(24);
+
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let d = p.height / 4 * 3;
+
+    drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
+      p.strokeWeight(1);
       drawTarget(p, x, y, d, [(p.frameCount / 2) % 24 + i / 3]);
     });
   };
