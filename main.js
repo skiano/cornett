@@ -119,6 +119,30 @@ function drawDust(p, cx, cy, d, amt = 1, makeColors = (p) => {
   }
 }
 
+function drawBurst(p, cx, cy, d, levels = 3, makeColors = (p) => {
+  let y = p.color(YELLOW);
+  let b = p.color(BLACK);
+  let steps = 6;
+  return [...new Array(steps)].map((_, i) => p.lerpColor(y, b, i / steps));
+}) {
+  let slices = 24;
+  let ang = p.TAU / slices;
+  let colors = makeColors(p);
+  p.push();
+  p.translate(cx, cy);
+  p.rectMode(p.CENTER);
+  p.noStroke();
+  for (let l = 0; l < levels; l++) {
+    p.fill(p.random(colors));
+    p.rotate(p.random(0, p.TAU));
+    for (let i = 0; i < slices / 2; i += 1) {
+      p.rect(0, 0, 10, p.random(d / (l + 3), d), d * 0.05);
+      p.rotate(ang);
+    }
+  }
+  p.pop();
+}
+
 function drawLogo(p, cx, cy, d, marker = (p, x, y, s) => {
   drawTarget(p, x, y, s, [4]);
 }) {
@@ -247,13 +271,14 @@ SKETCHES.push(function explainBursts(p, [fg, bg]) {
     p.background(bg);
     p.stroke(fg);
     p.noFill();
-    p.frameRate(10);
+    p.frameRate(7);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
     let d = p.height / 5 * 3;
 
     draw8x8(p, cx, cy, d);
+    drawBurst(p, cx, cy, d, 10, () => getDarks(p));
     drawDust(p, cx, cy, d, 0.1);
   };
 });
@@ -350,16 +375,6 @@ SKETCHES.push(function basicLogos(p, [fg, bg]) {
 });
 
 SKETCHES.push(function burstLogos(p, [fg, bg]) {
-  const markers = p.shuffle([
-    (p, x, y, d) => {
-      p.push();
-      p.fill(fg);
-      p.noStroke();
-      drawDust(p, x, y, (p.sin(p.frameCount / 14) * d + 2) * 1.5);
-      p.pop();
-    },
-  ])
-
   p.setup = function () {
     standardSetup(p);
     p.background(bg);
@@ -368,9 +383,9 @@ SKETCHES.push(function burstLogos(p, [fg, bg]) {
   };
 
   p.draw = function () {
-    // p.background(bg);
+    p.background(bg);
     p.background(p.lerpColor(p.color(YELLOW), p.color(BLACK), 0.5));
-    p.stroke(fg);
+    // p.stroke(fg);
     p.noFill();
     p.frameRate(12);
 
@@ -378,7 +393,21 @@ SKETCHES.push(function burstLogos(p, [fg, bg]) {
     let cy = p.height / 2;
     let d = p.height / 3 * 2;
 
-    drawLogo(p, cx, cy, d, markers[p.frameCount % markers.length]);
+    drawLogo(p, cx, cy, d, (p, x, y, d) => {
+      p.push();
+      p.fill(fg);
+      p.noStroke();
+      drawBurst(p, x, y, d * 1.5, 7, () => getDarks(p));
+      p.pop();
+    });
+
+    drawLogo(p, cx, cy, d, (p, x, y, d) => {
+      p.push();
+      p.fill(fg);
+      p.noStroke();
+      drawDust(p, x, y, (p.sin(p.frameCount / 14) * d + 2) * 1.5);
+      p.pop();
+    });
   };
 });
 
