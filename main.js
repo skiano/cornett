@@ -50,6 +50,7 @@ function standardSetup(p) {
   let w = s.offsetWidth;
   let h = s.offsetHeight;
   p.createCanvas(w, h);
+  p.startRecorder();
 }
 
 function draw8x8(p, cx, cy, d) {
@@ -198,6 +199,27 @@ function drawClipLogo(p, cx, cy, d, marker = (p, x, y, s) => {
 //////////////
 
 SKETCHES.push(function explainTarget(p, [fg, bg]) {
+  const masks = [
+    [1],
+    [1, 2],
+    [1, 2, 3, 4],
+    [2, 3, 4],
+    [3, 4],
+    [4],
+    [4],
+    [1, 4],
+    [1, 4],
+    [4],
+    [4],
+    [1, 4],
+    [1, 4],
+    [4],
+    [4],
+    [1, 4],
+  ];
+  
+  const totalFrames = masks.length * 6;
+
   p.setup = function () {
     standardSetup(p);
     p.background(bg);
@@ -217,27 +239,10 @@ SKETCHES.push(function explainTarget(p, [fg, bg]) {
 
     draw8x8(p, cx, cy, d);
 
-    const masks = [
-      [1],
-      [1, 2],
-      [1, 2, 3, 4],
-      [2, 3, 4],
-      [3, 4],
-      [4],
-      [4],
-      [1, 4],
-      [1, 4],
-      [4],
-      [4],
-      [1, 4],
-      [1, 4],
-      [4],
-      [4],
-      [1, 4],
-    ];
-
     p.strokeWeight(6);
     drawTarget(p, cx, cy, d, masks[p.frameCount % masks.length]);
+
+    if (p.frameCount === totalFrames) p.stopRecorder('yo-01');
   };
 });
 
