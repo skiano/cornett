@@ -1,5 +1,8 @@
 import './style.css'
 import p5 from 'p5';
+import addRecorder from './recorder';
+
+addRecorder(p5);
 
 ////////////////
 // BASIC JUNK //
@@ -616,7 +619,7 @@ SKETCHES.push(function checkers(p, [fg, bg]) {
   };
 });
 
-SKETCHES.forEach((sketch, idx) => {
+SKETCHES.splice(0, 1).forEach((sketch, idx) => {
   const sq = document.createElement('div');
   sq.classList.add('sq');
   ROOT.appendChild(sq);

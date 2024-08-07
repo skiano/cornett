@@ -51,9 +51,10 @@ body {
 .gd {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  width: 1080px;
 }
 
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
   .gd {
     grid-template-columns: 1fr;
   }
@@ -63,7 +64,7 @@ body {
   .gd {
     grid-template-columns: 1fr 1fr 1fr;
   }
-}
+} */
 
 .sq {
   aspect-ratio: 1;
