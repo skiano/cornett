@@ -218,7 +218,7 @@ SKETCHES.push(function explainTarget(p, [fg, bg]) {
     [1, 4],
   ];
   
-  const totalFrames = masks.length * 6;
+  const totalFrames = masks.length * 2;
 
   p.setup = function () {
     standardSetup(p);
@@ -242,7 +242,7 @@ SKETCHES.push(function explainTarget(p, [fg, bg]) {
     p.strokeWeight(6);
     drawTarget(p, cx, cy, d, masks[p.frameCount % masks.length]);
 
-    if (p.frameCount === totalFrames) p.stopRecorder('yo-01');
+    if (p.frameCount === totalFrames) p.stopRecorder('cornett-01');
   };
 });
 
@@ -267,6 +267,8 @@ SKETCHES.push(function explainFlower(p, [fg, bg]) {
     draw8x8(p, cx, cy, d);
     p.strokeWeight(4);
     drawFlower(p, cx, cy, d, p.frameCount, p.frameCount + 3);
+
+    if (p.frameCount === 8 * 4 + 1) p.stopRecorder('cornett-02');
   };
 });
 
@@ -282,7 +284,7 @@ SKETCHES.push(function explainBursts(p, [fg, bg]) {
     p.background(bg);
     p.stroke(fg);
     p.noFill();
-    p.frameRate(7);
+    p.frameRate(10);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
@@ -291,6 +293,8 @@ SKETCHES.push(function explainBursts(p, [fg, bg]) {
     draw8x8(p, cx, cy, d);
     drawBurst(p, cx, cy, d, 10, () => getDarks(p));
     drawDust(p, cx, cy, d, 0.1);
+
+    if (p.frameCount === 7 * 10) p.stopRecorder('cornett-03');
   };
 });
 
@@ -332,6 +336,8 @@ SKETCHES.push(function maskedOutlines(p, [fg, bg]) {
     let d = p.height / 3 * 2;
 
     drawClipLogo(p, cx, cy, d, markers[p.frameCount % markers.length]);
+
+    if (p.frameCount === markers.length * 3) p.stopRecorder('cornett-04');
   };
 });
 
@@ -381,6 +387,8 @@ SKETCHES.push(function basicLogos(p, [fg, bg]) {
     let d = p.height / 3 * 2;
 
     drawLogo(p, cx, cy, d, markers[p.frameCount % markers.length]);
+
+    if (p.frameCount === markers.length * 3) p.stopRecorder('cornett-05');
   };
 });
 
@@ -624,15 +632,17 @@ SKETCHES.push(function checkers(p, [fg, bg]) {
   };
 });
 
-SKETCHES.splice(0, 1).forEach((sketch, idx) => {
+let single = 5;
+
+SKETCHES.splice(single, 1).forEach((sketch, idx) => {
   const sq = document.createElement('div');
   sq.classList.add('sq');
   ROOT.appendChild(sq);
   new p5((p) => {
     let darks = getDarks(p);
     let lights = getLights(p);
-    const bg = darks[p.floor(idx / 2) % 2];
-    const fg = lights[p.floor(idx / 2) % 2];
-    sketch(p, idx % 2 ? [bg, fg] : [fg, bg]);
+    const bg = darks[p.floor(single / 2) % 2];
+    const fg = lights[p.floor(single / 2) % 2];
+    sketch(p, single % 2 ? [bg, fg] : [fg, bg]);
   }, sq);
 });
