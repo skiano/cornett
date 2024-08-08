@@ -16,7 +16,7 @@ const downloadBlob = (blob, title) => {
 
 export default function addRecorder(p5, opt) {
   opt = {
-    fps: 30,
+    fps: 24,
     ...opt,
   };
 
@@ -58,8 +58,8 @@ export default function addRecorder(p5, opt) {
       codec: 'avc1.64802a', // maybe higher quality? (based on chat gpt)
       width: this.canvas.width,
       height: this.canvas.height,
-      // bitrate: 1e6 * 5,
-      bitrate: 1e6 * 10,
+      bitrate: 1e6 * 5,
+      // bitrate: 1e6 * 10,
     });
     this.stopRecorder = async function(title = 'video') {
       this._recorderStopped = true;

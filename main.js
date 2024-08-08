@@ -545,6 +545,8 @@ SKETCHES.push(function gravity(p, [fg, bg]) {
     p.noFill();
   };
 
+  let loopCount = 0;
+
   p.draw = function () {
     p.background(bg);
     p.frameRate(18);
@@ -554,6 +556,7 @@ SKETCHES.push(function gravity(p, [fg, bg]) {
     let d = p.height / 5;
     let t = smoothstep(p.norm(p.frameCount % 20, 0, 20));
     let t2 = smoothstep(p.norm(p.frameCount % 40, 0, 40));
+    if (t2 < 0.000001) loopCount ++;
 
     for (let i = p.map(t2, 0, 1, 0, 50); i < p.map(t, 0, 1, 0, 200); i++) {
       p.fill(i % 2 === 1 ? fg : bg);
@@ -561,6 +564,8 @@ SKETCHES.push(function gravity(p, [fg, bg]) {
         drawTarget(p, x, y, d, [2]);
       });
     }
+
+    if (loopCount > 2) p.stopRecorder('cornett-10');
   };
 });
 
@@ -594,10 +599,12 @@ SKETCHES.push(function checkers(p, [fg, bg]) {
         });
       }
     }
+
+    if (p.frameCount > 18) p.stopRecorder('cornett-11');
   };
 });
 
-SKETCHES.push(function checkers(p, [fg, bg]) {
+SKETCHES.push(function clock(p, [fg, bg]) {
   p.setup = function () {
     standardSetup(p);
     p.background(bg);
@@ -645,10 +652,11 @@ SKETCHES.push(function checkers(p, [fg, bg]) {
         drawTarget(p, x, y, d, [1]);
       });
     p.pop();
+    if (p.frameCount > 125 * 2 + 1) p.stopRecorder('cornett-12');
   };
 });
 
-let single = 8;
+let single = 11;
 
 SKETCHES.splice(single, 1).forEach((sketch, idx) => {
   const sq = document.createElement('div');
