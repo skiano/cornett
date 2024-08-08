@@ -54,10 +54,12 @@ export default function addRecorder(p5, opt) {
       error: e => console.error(e)
     });
     this._encoder.configure({
-      codec: 'avc1.4d002a', // 'avc1.42001f', ???? WTF is a good option here?
+      // codec: 'avc1.4d002a', // 'avc1.42001f', ???? WTF is a good option here?
+      codec: 'avc1.64802a', // maybe higher quality? (based on chat gpt)
       width: this.canvas.width,
       height: this.canvas.height,
-      bitrate: 1e6,
+      // bitrate: 1e6 * 5,
+      bitrate: 1e6 * 10,
     });
     this.stopRecorder = async function(title = 'video') {
       this._recorderStopped = true;

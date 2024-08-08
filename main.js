@@ -404,7 +404,7 @@ SKETCHES.push(function burstLogos(p, [fg, bg]) {
     p.background(bg);
     p.background(p.lerpColor(p.color(YELLOW), p.color(BLACK), 0.5));
     p.noFill();
-    p.frameRate(12);
+    p.frameRate(15);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
@@ -425,6 +425,8 @@ SKETCHES.push(function burstLogos(p, [fg, bg]) {
     drawLogo(p, cx, cy, d, (p, x, y, d) => {
       drawDust(p, x, y, (p.sin(p.frameCount / 14) * d + 2) * 1.5);
     });
+
+    if (p.frameCount > 15 * 6) p.stopRecorder('cornett-06');
   };
 });
 
@@ -440,7 +442,7 @@ SKETCHES.push(function ripple(p, [fg, bg]) {
     p.background(bg);
     p.stroke(fg);
     p.noFill();
-    p.frameRate(24);
+    p.frameRate(30);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
@@ -448,8 +450,10 @@ SKETCHES.push(function ripple(p, [fg, bg]) {
 
     drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
       p.strokeWeight(1);
-      drawTarget(p, x, y, d, [(p.frameCount / 2) % 24 + i / 3]);
+      drawTarget(p, x, y, d, [(p.frameCount / 2) % 30 + i / 3]);
     });
+
+    if (p.frameCount > 30 * 4 - 4) p.stopRecorder('cornett-07');
   };
 });
 
@@ -467,19 +471,24 @@ SKETCHES.push(function gather(p, [fg, bg]) {
     ]);
   };
 
+  let loopCount = 0;
+
   p.draw = function () {
     p.background(bg);
     p.stroke(fg);
     p.noFill();
-    p.frameRate(24);
+    p.frameRate(30);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
     let d = p.height / 4 * 3;
 
+    let t = smoothstep(p.norm(p.sin(p.frameCount / 15), -1, 1));
+    if (t < 0.000001) loopCount ++;
+
     for (let l = 0; l < 8; l++) {
       drawLogo(p, cx, cy, d, (p, x, y, d, i) => {
-        let t = smoothstep(p.norm(p.sin(p.frameCount / 15), -1, 1));
+        
         p.fill(bg);
         p.stroke(fg);
         p.strokeWeight(4)
@@ -487,6 +496,8 @@ SKETCHES.push(function gather(p, [fg, bg]) {
         drawTarget(p, p.lerp(ix, x, t), p.lerp(iy, y, t), d, [2]);
       });
     }
+
+    if (loopCount > 3) p.stopRecorder('cornett-08');
   };
 });
 
@@ -499,15 +510,18 @@ SKETCHES.push(function gravity(p, [fg, bg]) {
     p.noFill();
   };
 
+  let loopCount = 0;
+
   p.draw = function () {
     p.background(bg);
-    p.frameRate(18);
+    p.frameRate(30);
 
     let cx = p.width / 2;
     let cy = p.height / 2;
     let d = p.height / 4 * 3;
 
-    let t = smoothstep(p.norm(p.sin(p.frameCount / 5), -1, 1));
+    let t = smoothstep(p.norm(p.cos(p.frameCount / 15), -1, 1));
+    if (t > 0.9999999) loopCount ++;
 
     let min = p.map(t, 0, 1, 2, 10);
     let max = p.map(t, 0, 1, 10, 40);
@@ -517,6 +531,8 @@ SKETCHES.push(function gravity(p, [fg, bg]) {
         drawTarget(p, x, y, d, [4]);
       }, i);
     }
+
+    if (loopCount > 1) p.stopRecorder('cornett-09');
   };
 });
 
@@ -632,7 +648,7 @@ SKETCHES.push(function checkers(p, [fg, bg]) {
   };
 });
 
-let single = 5;
+let single = 8;
 
 SKETCHES.splice(single, 1).forEach((sketch, idx) => {
   const sq = document.createElement('div');
@@ -641,8 +657,8 @@ SKETCHES.splice(single, 1).forEach((sketch, idx) => {
   new p5((p) => {
     let darks = getDarks(p);
     let lights = getLights(p);
-    const bg = darks[p.floor(single / 2) % 2];
-    const fg = lights[p.floor(single / 2) % 2];
+    const bg = darks[1];
+    const fg = lights[0];
     sketch(p, single % 2 ? [bg, fg] : [fg, bg]);
   }, sq);
 });
